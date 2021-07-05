@@ -11,6 +11,7 @@ import android.os.IBinder
 import android.os.Parcelable
 import android.os.PowerManager
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.core.content.getSystemService
@@ -245,6 +246,7 @@ class PlayerService : Service() {
         }
     }
     private fun broadcastPlaybackStatusChanged() {
+        Log.d("$packageName.broadcast", "Sending playstate event")
         Intent().also { intent ->
             intent.action = "${packageName}.playstatechanged"
             intent.putExtra("playing", mediaPlayerHolder.isPlaying)
@@ -252,6 +254,7 @@ class PlayerService : Service() {
         }
     }
     private fun broadcastMetadataChanged() {
+        Log.d("$packageName.broadcast", "Sending metachanged event")
         Intent().also { intent ->
             intent.action = "${packageName}.metachanged"
             intent.putExtra("artist", mediaPlayerHolder.currentSong.first?.artist)
@@ -260,6 +263,7 @@ class PlayerService : Service() {
         }
     }
     private fun broadcastPlaybackCompleted() {
+        Log.d("$packageName.broadcast", "Sending playback completed event")
         Intent().also { intent ->
             intent.action = "${packageName}.playbackcomplete"
             intent.putExtra("artist", mediaPlayerHolder.currentSong.first?.artist)
