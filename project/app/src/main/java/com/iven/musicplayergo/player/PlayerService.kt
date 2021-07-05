@@ -43,22 +43,27 @@ class PlayerService : Service() {
     private val mMediaSessionCallback = object : MediaSessionCompat.Callback() {
 
         override fun onPlay() {
+            broadcastPlaybackStatusChanged()
             mediaPlayerHolder.resumeOrPause()
         }
 
         override fun onPause() {
+            broadcastPlaybackStatusChanged()
             mediaPlayerHolder.resumeOrPause()
         }
 
         override fun onSkipToNext() {
+            broadcastMetadataChanged()
             mediaPlayerHolder.skip(true)
         }
 
         override fun onSkipToPrevious() {
+            broadcastMetadataChanged()
             mediaPlayerHolder.skip(false)
         }
 
         override fun onStop() {
+            broadcastPlaybackCompleted()
             mediaPlayerHolder.stopPlaybackService(true)
         }
 
@@ -239,4 +244,28 @@ class PlayerService : Service() {
             }
         }
     }
+    private fun broadcastPlaybackStatusChanged() {
+        Intent().also { intent ->
+            intent.action = "${packageName}.playstatechanged"
+            intent.putExtra("playing", mediaPlayerHolder.isPlaying)
+            sendBroadcast(intent)
+        }
+    }
+    private fun broadcastMetadataChanged() {
+        Intent().also { intent ->
+            intent.action = "${packageName}.metachanged"
+            intent.putExtra("artist", mediaPlayerHolder.currentSong.first?.artist)
+            intent.putExtra("track", mediaPlayerHolder.currentSong.first?.title)
+            sendBroadcast(intent)
+        }
+    }
+    private fun broadcastPlaybackCompleted() {
+        Intent().also { intent ->
+            intent.action = "${packageName}.playbackcomplete"
+            intent.putExtra("artist", mediaPlayerHolder.currentSong.first?.artist)
+            intent.putExtra("track", mediaPlayerHolder.currentSong.first?.title)
+            sendBroadcast(intent)
+        }
+    }
+    private fun broadcastQueueChanged() {}
 }
