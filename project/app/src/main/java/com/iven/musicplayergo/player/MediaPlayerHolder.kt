@@ -16,11 +16,13 @@ import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.Virtualizer
 import android.os.Build
+import android.os.Bundle
 import android.os.PowerManager
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.*
 import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.media.session.PlaybackStateCompat.*
+import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -304,6 +306,7 @@ class MediaPlayerHolder(private val playerService: PlayerService) :
                 playerService.getMediaSession().setMetadata(build())
             }
         }
+        broadcastMetadataChanged()
     }
 
     override fun onCompletion(mediaPlayer: MediaPlayer) {
@@ -312,6 +315,7 @@ class MediaPlayerHolder(private val playerService: PlayerService) :
 
         mediaPlayerInterface.onStateChanged()
         mediaPlayerInterface.onPlaybackCompleted()
+        broadcastPlaybackCompleted()
 
         when {
             isRepeat1X or isLooping -> if (isMediaPlayer) {
@@ -405,6 +409,7 @@ class MediaPlayerHolder(private val playerService: PlayerService) :
         if (updateUI) {
             mediaPlayerInterface.onStateChanged()
         }
+        broadcastPlaybackStatusChanged()
     }
 
     private fun startOrChangePlaybackSpeed() {
@@ -435,6 +440,7 @@ class MediaPlayerHolder(private val playerService: PlayerService) :
 
             isPlay = true
         }
+        broadcastPlaybackStatusChanged()
     }
 
     fun pauseMediaPlayer() {
@@ -448,6 +454,7 @@ class MediaPlayerHolder(private val playerService: PlayerService) :
             updateNotification()
         }
         mediaPlayerInterface.onFocusLoss()
+        broadcastPlaybackStatusChanged()
     }
 
     fun repeatSong() {
@@ -686,6 +693,7 @@ class MediaPlayerHolder(private val playerService: PlayerService) :
         state = GoConstants.PLAYING
         updatePlaybackStatus(true)
         startForeground()
+        broadcastPlaybackStatusChanged()
     }
 
     private fun restoreCustomEqSettings() {
@@ -772,6 +780,7 @@ class MediaPlayerHolder(private val playerService: PlayerService) :
         } else {
             resumeMediaPlayer()
         }
+        broadcastPlaybackStatusChanged()
     }
 
     private fun getRepeatMode() {
@@ -846,6 +855,7 @@ class MediaPlayerHolder(private val playerService: PlayerService) :
                 initMediaPlayer(currentSong.first)
             }
         }
+        broadcastMetadataChanged()
     }
 
     fun fastSeek(isForward: Boolean) {
@@ -998,4 +1008,36 @@ class MediaPlayerHolder(private val playerService: PlayerService) :
             }
         }
     }
+
+    private fun broadcastPlaybackStatusChanged() {
+        Log.d("${playerService.packageName}.broadcast", "Sending playstate event")
+        Intent().also { intent ->
+            intent.action = "com.android.music.playstatechanged"
+            val bundle = Bundle()
+            bundle.putString("artist", currentSong.first?.artist)
+            bundle.putString("track", currentSong.first?.title)
+            bundle.putBoolean("playing", isPlaying)
+            intent.putExtras(bundle)
+            playerService.sendBroadcast(intent)
+        }
+        Log.d("${playerService.packageName}.broadcast", "playbackstatus for '${currentSong.first?.title}' by '${currentSong.first?.artist}' changed")
+    }
+    private fun broadcastMetadataChanged() {
+        Log.d("${playerService.packageName}.broadcast", "Sending metachanged event")
+        Intent().also { intent ->
+            intent.action = "com.android.music.metachanged"
+            val bundle = Bundle()
+            bundle.putString("artist", currentSong.first?.artist)
+            bundle.putString("track", currentSong.first?.title)
+            bundle.putBoolean("playing", isPlaying)
+            intent.putExtras(bundle)
+            playerService.sendBroadcast(intent)
+        }
+        Log.d("${playerService.packageName}.broadcast", "Current song is '${currentSong.first?.title}' by '${currentSong.first?.artist}'")
+    }
+    private fun broadcastPlaybackCompleted() {
+        broadcastMetadataChanged()
+    }
+    private fun broadcastQueueChanged() {}
+
 }
