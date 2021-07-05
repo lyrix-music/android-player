@@ -60,7 +60,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             setOnMenuItemClickListener {
                 if (it.itemId == R.id.github_page) {
-                    openGitHubPage()
+                    openGitHubPage(R.string.app_git)
+                } else if (it.itemId == R.id.github_fork_page) {
+                    openGitHubPage(R.string.app_git_fork)
                 }
                 return@setOnMenuItemClickListener true
             }
@@ -75,13 +77,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     @SuppressLint("QueryPermissionsNeeded")
-    private fun openGitHubPage() {
+    private fun openGitHubPage(urlId: Int) {
        val customTabsIntent = CustomTabsIntent.Builder()
            .setShareState(CustomTabsIntent.SHARE_STATE_ON)
            .setShowTitle(true)
            .build()
 
-        val parsedUri = getString(R.string.app_git).toUri()
+        val parsedUri = getString(urlId).toUri()
         val manager = requireActivity().packageManager
         val info = manager.queryIntentActivities(customTabsIntent.intent, 0)
         if (info.size > 0) {

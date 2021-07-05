@@ -6,4 +6,9 @@
         android:title="@string/open_git_pref_summary"
         android:icon="@drawable/ic_code"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/github_fork_page"
+        android:title="@string/open_git_pref_summary"
+        android:icon="@drawable/ic_code"
+        app:showAsAction="always" />
 </menu>
