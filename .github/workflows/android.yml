@@ -2,12 +2,12 @@ name: Android CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ lyrix ]
     tags:
       - v*.*
 
   pull_request:
-    branches: [ main ]
+    branches: [ lyrix ]
 
 
 jobs:
