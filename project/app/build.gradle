@@ -10,7 +10,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 164
-        versionName "4.4.2"
+        versionName "4.4.2+lyrix.1"
 
         vectorDrawables.useSupportLibrary true
     }
